@@ -118,3 +118,4 @@ if __name__ == '__main__':
     app = AppVision(url_capture='http://192.168.1.161:8080/video')
 
     app.run()
+print('oi')
