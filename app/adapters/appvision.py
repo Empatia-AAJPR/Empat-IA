@@ -4,58 +4,7 @@ from ultralytics import YOLO
 
 from insightface.app import FaceAnalysis
 
-
-class AnalysisFaceManager:
-    def __init__(
-        self, model_name: str = 'buffalo_s', providers: list = []
-    ) -> None:
-        self.app = FaceAnalysis(name=model_name, providers=providers)
-        self.app.prepare(ctx_id=0, det_size=(320, 320))
-        self.faces_vetors: dict = {}
-
-    def parser_images(self, images: list) -> None:
-        for img in images:
-            _img = cv2.imread(img)
-
-            if _img is None:
-                print(f'image {img} is None')
-                continue
-
-            faces = self.app.get(_img)
-
-            if len(faces) > 0:
-                embedding = faces[0].normed_embedding
-
-                self.faces_vetors[img.split('/')[-1]] = embedding
-
-            else:
-                print('nenhum rosto detectado')
-                continue
-
-
-class YOLOManager:
-    def __init__(
-        self, yolo_name: str = 'yolov8n.pt', track_name: str = 'bytetrack.yaml'
-    ) -> None:
-        self.model = YOLO(yolo_name, task='detect')
-        self.algorithm_track = track_name
-
-    def detect(self, frame) -> list:
-        return self.model.predict(frame)
-
-    def _track_frame(self, frame):
-        return self.model.track(
-            source=frame,
-            persist=True,
-            classes=[0],
-            tracker=self.algorithm_track,
-            device='cpu',
-            iou=0.5,
-            imgsz=640,
-            conf=0.4,
-            verbose=False,
-        )
-
+from person_test import YOLOManager
 
 class AppVision:
     def __init__(self, url_capture: str | int) -> None:
@@ -112,9 +61,3 @@ class AppVision:
             return result.boxes.id.cpu().numpy().astype(int)
         else:
             return [None] * len(boxes)
-
-
-if __name__ == '__main__':
-    app = AppVision(url_capture='http://192.168.1.161:8080/video')
-
-    app.run()
