@@ -28,7 +28,12 @@ class AppVision:
 
                 for box, conf, id in zip(boxes, confs, ids):
                     if id is not None:
+
+                        person_slicing = self.cut_frame(frame, box)
+
                         id = int(id)
+
+                        cv2.imshow(f'id: {id}', person_slicing)
 
                         self.persons[id] = {
                             'box': list(
@@ -58,3 +63,11 @@ class AppVision:
             return result.boxes.id.cpu().numpy().astype(int)
         else:
             return [None] * len(boxes)
+
+    def cut_frame(self, frame, box):
+        x1, y1, x2, y2 = map(int, box)
+
+        x1, y1 = [max(0, x1), max(0, y1)]
+
+        crop = frame[y1:y2, x1:x2]
+        return crop
