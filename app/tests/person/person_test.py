@@ -4,6 +4,7 @@ from ultralytics import YOLO
 
 from insightface.app import FaceAnalysis
 
+
 class YOLOManager:
     def __init__(
         self, yolo_name: str = 'yolov8n.pt', track_name: str = 'bytetrack.yaml'

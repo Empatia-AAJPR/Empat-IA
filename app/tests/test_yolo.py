@@ -84,7 +84,7 @@ class AppVision:
                 window_name = f'Pessoa ID {track_id}'
                 cv2.imshow(window_name, pessoa_recortada)
 
-        print("Pressione qualquer tecla em uma janela de imagem para fechar.")
+        print('Pressione qualquer tecla em uma janela de imagem para fechar.')
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 

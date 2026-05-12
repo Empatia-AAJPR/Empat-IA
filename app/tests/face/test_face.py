@@ -4,6 +4,7 @@ from ultralytics import YOLO
 
 from insightface.app import FaceAnalysis
 
+
 class AnalysisFaceManager:
     def __init__(
         self, model_name: str = 'buffalo_s', providers: list = []

@@ -1,10 +1,7 @@
 import cv2
 
-from ultralytics import YOLO
+from managers.person_model import YOLOManager
 
-from insightface.app import FaceAnalysis
-
-from person_test import YOLOManager
 
 class AppVision:
     def __init__(self, url_capture: str | int) -> None:
