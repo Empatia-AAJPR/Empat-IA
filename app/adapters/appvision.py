@@ -8,7 +8,7 @@ class AppVision:
     def __init__(self, url_capture: str | int) -> None:
         self.cap = cv2.VideoCapture(url_capture)
         self.tracker = YOLOManager(yolo_name='yolov8n_openvino_model/')
-        self.detect_isolation = DBScanManager()
+        self.detect_isolation = DBScanManager(eps=150)
         self.persons = {}
 
     def run(self) -> None:
@@ -51,6 +51,10 @@ class AppVision:
 
                             crop = self.cut_frame(frame, box_ids)
 
+                            if person not in ids:
+                                continue
+
+                            print(person)
                             cv2.imshow(f"id: {person}", crop)
 
                 cv2.imshow('EmpatIA', result.plot())
