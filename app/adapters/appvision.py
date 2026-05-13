@@ -1,5 +1,6 @@
 import cv2
 
+from managers.face import AnalysisFaceManager
 from managers.isolation_detector import DBScanManager
 from managers.person_model import YOLOManager
 
@@ -9,12 +10,14 @@ class AppVision:
         self.cap = cv2.VideoCapture(url_capture)
         self.tracker = YOLOManager(yolo_name='yolov8n_openvino_model/')
         self.detect_isolation = DBScanManager(eps=150)
+        self.face_detection = AnalysisFaceManager(providers=['CPUExecutionProvider'])
         self.persons = {}
 
     def run(self) -> None:
         while True:
             ret, frame = self.cap.read()
             if not ret:
+                print('nao foi possivel iniciar a leitura')
                 break
 
             frame = cv2.resize(frame, (960, 640))
@@ -54,7 +57,12 @@ class AppVision:
                             if person not in ids:
                                 continue
 
-                            print(person)
+                            person = self.face_detection.get_face_person('app/assets/arthur.jpeg', crop)
+
+                            if person is None or person is False:
+                                print('nao e a mesma pessoa')
+                                continue
+
                             cv2.imshow(f"id: {person}", crop)
 
                 cv2.imshow('EmpatIA', result.plot())
