@@ -6,3 +6,4 @@ if __name__ == '__main__':
     app.run()
 
 # 'http://192.168.1.161:8080/video'
+# 'http://192.168.1.83:8080/video'

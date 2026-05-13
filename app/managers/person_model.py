@@ -1,8 +1,4 @@
-import cv2
-
 from ultralytics import YOLO
-
-from insightface.app import FaceAnalysis
 
 
 class YOLOManager:
