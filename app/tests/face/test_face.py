@@ -1,5 +1,6 @@
 import cv2
 
+import numpy as np
 from ultralytics import YOLO
 
 from insightface.app import FaceAnalysis
@@ -32,18 +33,30 @@ class AnalysisFaceManager:
             else:
                 print('nenhum rosto detectado')
                 continue
+    
+    def get_person(self, base, crop_frame):
+        img_base = cv2.imread(base)
+
+        img_detect = cv2.imread(crop_frame)
+
+        if img_base is None:
+            return
+        
+        face_base = self.app.get(img_base)
+
+        face_detect = self.app.get(img_detect)
+
+        embedding_base = face_base[0].normed_embedding
+        embedding_detect = face_detect[0].normed_embedding
+
+        similarity = np.dot(embedding_base, embedding_detect)
+
+        print(similarity)
 
 
 if __name__ == '__main__':
     face_analyser = AnalysisFaceManager(providers=['CPUExecutionProvider'])
-    face_analyser.parser_images(
-        [
-            'app/assets/antonio.jpeg',
-            'app/assets/arthur.jpeg',
-            'app/assets/rian.jpeg',
-            'app/assets/pablo.jpeg',
-            'app/assets/joao.jpeg',
-        ]
+    face_analyser.get_person(
+        'app/assets/arthur.jpeg',
+        'app/assets/arthur.jpeg'
     )
-
-    print(f'Vetores faciais: {face_analyser.faces_vetors}')
