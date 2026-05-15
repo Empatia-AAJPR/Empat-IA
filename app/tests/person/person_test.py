@@ -27,3 +27,18 @@ class YOLOManager:
             conf=0.4,
             verbose=False,
         )
+
+if __name__ == "__main__":
+    cap = cv2.VideoCapture(2)
+
+    while True:
+        ret, frame = cap.read()
+
+        if not ret:
+            break
+
+        cv2.imshow('t', frame)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+

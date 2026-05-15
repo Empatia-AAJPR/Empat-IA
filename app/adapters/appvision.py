@@ -14,7 +14,8 @@ class AppVision:
         self.tracker = YOLOManager(yolo_name='yolov8n_openvino_model/')
         self.detect_isolation = DBScanManager(eps=150)
         self.face_detection = AnalysisFaceManager(
-            providers=['CPUExecutionProvider']
+            providers=['OpenVINOExecutionProvider','CPUExecutionProvider'],
+            use_gpu=False
         )
         self.emotions = EmotionDetecManager()
         self.persons = {}

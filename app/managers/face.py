@@ -3,16 +3,27 @@ import cv2
 from insightface.app import FaceAnalysis
 import numpy as np
 
+import os
+
 
 class AnalysisFaceManager:
     def __init__(
         self,
-        model_name: str = 'buffalo_s',
+        use_gpu: bool,
+        model_root: str = 'models/',
         providers: list = [],
         conf: float = 0.5,
     ) -> None:
-        self.app = FaceAnalysis(name=model_name, providers=providers)
-        self.app.prepare(ctx_id=0, det_size=(320, 320))
+        if model_root is None:
+            model_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+        self.app = FaceAnalysis(
+            name='buffalo_s', 
+            root=model_root,
+            providers=providers,
+            allowed_modules=['detection', 'recognition'],
+        )
+        self.app.prepare(ctx_id=-1 if use_gpu is False else 0, det_size=(320, 320))
         self.faces_vetors: dict = {}
         self.conf = conf
 
