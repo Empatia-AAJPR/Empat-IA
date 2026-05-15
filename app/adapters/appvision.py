@@ -2,6 +2,7 @@ import time
 
 import cv2
 
+from managers.emotions import EmotionDetecManager
 from managers.face import AnalysisFaceManager
 from managers.isolation_detector import DBScanManager
 from managers.person_model import YOLOManager
@@ -15,6 +16,7 @@ class AppVision:
         self.face_detection = AnalysisFaceManager(
             providers=['CPUExecutionProvider']
         )
+        self.emotions = EmotionDetecManager()
         self.persons = {}
 
         self.face_cache: dict[int, bool | None] = {}
@@ -96,6 +98,9 @@ class AppVision:
                             self.face_cache[person_id] = bool(combined)
 
                             self.last_face_check[person_id] = time.time()
+
+                            emocao = self.emotions.capture_emotion(img=crop)
+                            print(emocao)
 
                             cv2.imshow(f'id: {combined}', crop)
 

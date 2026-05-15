@@ -1,6 +1,4 @@
 from fer.fer import FER
-import cv2
-import numpy as np
 
 
 class EmotionDetecManager:
@@ -8,7 +6,7 @@ class EmotionDetecManager:
         self.detector = FER(mtcnn=False)
 
     def capture_emotion(self, img):
-        _img = cv2.imread(img)
+        _img = img
 
         if _img is None:
             return
@@ -25,9 +23,3 @@ class EmotionDetecManager:
         for key, value in _emotions.items():
             if value == conf:
                 return key
-
-if __name__ == '__main__':
-    detector = EmotionDetecManager()
-    pessoa = 'app/assets/rian.jpeg'
-
-    print(detector.capture_emotion(pessoa))
