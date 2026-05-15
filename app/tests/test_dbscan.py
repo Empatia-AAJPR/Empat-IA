@@ -30,7 +30,7 @@ print(predict)
 class DBScanManager:
     def __init__(self, eps: float = float(250)) -> None:
         self.scan = DBSCAN(eps=eps, min_samples=2)
-        self.inf_persons: dict 
+        self.inf_persons: dict
         self.persons_cord: list
 
     def _to_list(self, inf: dict):

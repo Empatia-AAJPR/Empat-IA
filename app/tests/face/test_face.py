@@ -33,7 +33,7 @@ class AnalysisFaceManager:
             else:
                 print('nenhum rosto detectado')
                 continue
-    
+
     def get_person(self, base, crop_frame):
         img_base = cv2.imread(base)
 
@@ -41,7 +41,7 @@ class AnalysisFaceManager:
 
         if img_base is None:
             return
-        
+
         face_base = self.app.get(img_base)
 
         face_detect = self.app.get(img_detect)
@@ -57,6 +57,5 @@ class AnalysisFaceManager:
 if __name__ == '__main__':
     face_analyser = AnalysisFaceManager(providers=['CPUExecutionProvider'])
     face_analyser.get_person(
-        'app/assets/arthur.jpeg',
-        'app/assets/arthur.jpeg'
+        'app/assets/arthur.jpeg', 'app/assets/arthur.jpeg'
     )

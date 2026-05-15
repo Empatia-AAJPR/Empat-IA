@@ -1,3 +1,5 @@
+import time
+
 import cv2
 
 from managers.face import AnalysisFaceManager
@@ -10,8 +12,21 @@ class AppVision:
         self.cap = cv2.VideoCapture(url_capture)
         self.tracker = YOLOManager(yolo_name='yolov8n_openvino_model/')
         self.detect_isolation = DBScanManager(eps=150)
-        self.face_detection = AnalysisFaceManager(providers=['CPUExecutionProvider'])
+        self.face_detection = AnalysisFaceManager(
+            providers=['CPUExecutionProvider']
+        )
         self.persons = {}
+
+        self.face_cache: dict[int, bool | None] = {}
+
+        self.frame_count: int = 0
+        self.pass_frame: float = 5
+
+        self.cached_isolations: list = []
+
+        self.face_coldown: float = 5.0
+
+        self.last_face_check: dict[int, float] = {}
 
     def run(self) -> None:
         while True:
@@ -21,6 +36,7 @@ class AppVision:
                 break
 
             frame = cv2.resize(frame, (960, 640))
+            self.frame_count += 1
 
             results = self.tracker._track_frame(frame)
 
@@ -46,24 +62,42 @@ class AppVision:
                     # print(f'{self.persons}\n')
 
                 if self.persons:
-                    lonely_ids = self.detect_isolation.execute(self.persons)
+                    if self.frame_count % self.pass_frame == 0:
+                        self.cached_isolations = self.detect_isolation.execute(
+                            self.persons
+                        )
+
+                    lonely_ids = self.cached_isolations
 
                     if lonely_ids:
-                        for person in lonely_ids:
-                            box_ids = self.persons[person]['box']
+                        for person_id in lonely_ids:
+                            if person_id not in ids:
+                                continue
+
+                            box_ids = self.persons[person_id]['box']
+
+                            if self.cooldown_rechead(person_id):
+                                if self.face_cache.get(person_id):
+                                    crop = self.cut_frame(frame, box_ids)
+                                    cv2.imshow(f'id: {person_id}', crop)
+                                    print('verificado')
+                                    continue
 
                             crop = self.cut_frame(frame, box_ids)
 
-                            if person not in ids:
-                                continue
+                            combined = self.face_detection.get_face_person(
+                                'app/assets/arthur.jpeg', crop
+                            )
 
-                            person = self.face_detection.get_face_person('app/assets/arthur.jpeg', crop)
-
-                            if person is None or person is False:
+                            if combined is None or combined is False:
                                 print('nao e a mesma pessoa')
                                 continue
 
-                            cv2.imshow(f"id: {person}", crop)
+                            self.face_cache[person_id] = bool(combined)
+
+                            self.last_face_check[person_id] = time.time()
+
+                            cv2.imshow(f'id: {combined}', crop)
 
                 cv2.imshow('EmpatIA', result.plot())
 
@@ -72,6 +106,14 @@ class AppVision:
 
         self.cap.release()
         cv2.destroyAllWindows()
+
+    def cooldown_rechead(self, person_id: int):
+        now = time.time()
+        last_check = self.last_face_check.get(person_id, 0)
+
+        cooldown = (now - last_check) >= self.face_coldown
+
+        return cooldown
 
     def _get_atributes(self, result):
         return {

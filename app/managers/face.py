@@ -6,7 +6,10 @@ import numpy as np
 
 class AnalysisFaceManager:
     def __init__(
-        self, model_name: str = 'buffalo_s', providers: list = [], conf: float = 0.5
+        self,
+        model_name: str = 'buffalo_s',
+        providers: list = [],
+        conf: float = 0.5,
     ) -> None:
         self.app = FaceAnalysis(name=model_name, providers=providers)
         self.app.prepare(ctx_id=0, det_size=(320, 320))
@@ -31,7 +34,7 @@ class AnalysisFaceManager:
             else:
                 print('nenhum rosto detectado')
                 continue
-    
+
     def get_face_person(self, base, crop_frame):
         img_base = cv2.imread(base)
 
@@ -39,7 +42,7 @@ class AnalysisFaceManager:
 
         if img_base is None:
             return
-        
+
         face_base = self.app.get(img_base)
 
         face_detect = self.app.get(img_detect)
@@ -50,10 +53,9 @@ class AnalysisFaceManager:
         similarity = np.dot(embedding_base, embedding_detect)
 
         return self.is_same_person(similarity)
-    
+
     def is_same_person(self, result):
         if result >= self.conf:
             return True
-        
+
         return False
-    

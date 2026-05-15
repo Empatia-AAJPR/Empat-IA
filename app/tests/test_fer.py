@@ -2,19 +2,17 @@ from fer.fer import FER
 import cv2
 import numpy as np
 
-# Inicializa o detector
-detector = FER(mtcnn=False)
 
-# Carrega imagem
-img = cv2.imread('app/assets/rian.jpeg')
+class EmotionDetecManager:
+    def __init__(self) -> None:
+        self.detector = FER(mtcnn=False)
 
-# Garante que a imagem foi carregada e converte explicitamente
-if img is None:
-    print('Erro: imagem não encontrada')
-else:
-    img = np.array(
-        img
-    )  # conversão explícita para ndarray, resolve o type error
+    def capture_emotion(self, img):
+        _img = cv2.imread(img)
 
-    resultado = detector.detect_emotions(img)
-    print(resultado)
+        if _img is None:
+            return
+        
+        _img = np.array(img)
+
+        return self.detector.detect_emotions(_img)
