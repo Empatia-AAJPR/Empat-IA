@@ -1,50 +1,47 @@
-import cv2
-
-from insightface.app import FaceAnalysis
-import numpy as np
-
 import os
+import sys
 
+
+cuda_path = r"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.4\bin"
+if os.path.exists(cuda_path):
+    os.add_dll_directory(cuda_path)
+try:
+    import nvidia.cudnn
+    os.add_dll_directory(os.path.join(os.path.dirname(nvidia.cudnn.__file__), "bin"))
+except:
+    pass
+
+import cv2
+import numpy as np
+from insightface.app import FaceAnalysis
 
 class AnalysisFaceManager:
     def __init__(
         self,
         use_gpu: bool,
         model_root: str = 'models/',
-        providers: list = [],
+        providers: list = None,  
         conf: float = 0.5,
     ) -> None:
         if model_root is None:
             model_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+        
+        if use_gpu:
+            providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
+        else:
+            providers = ['CPUExecutionProvider']
+
         self.app = FaceAnalysis(
             name='buffalo_s', 
             root=model_root,
-            providers=providers,
+            providers=providers,  
             allowed_modules=['detection', 'recognition'],
         )
-        self.app.prepare(ctx_id=-1 if use_gpu is False else 0, det_size=(320, 320))
+        
+        self.app.prepare(ctx_id=0 if use_gpu else -1, det_size=(320, 320))
         self.faces_vetors: dict = {}
         self.conf = conf
-
-    def parser_images(self, images: list) -> None:
-        for img in images:
-            _img = cv2.imread(img)
-
-            if _img is None:
-                print(f'image {img} is None')
-                continue
-
-            faces = self.app.get(_img)
-
-            if len(faces) > 0:
-                embedding = faces[0].normed_embedding
-
-                self.faces_vetors[img.split('/')[-1]] = embedding
-
-            else:
-                print('nenhum rosto detectado')
-                continue
 
     def get_face_person(self, base, crop_frame):
         img_base = cv2.imread(base)

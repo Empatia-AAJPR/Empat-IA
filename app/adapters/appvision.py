@@ -1,3 +1,6 @@
+import os
+os.environ["YOLO_AUTOUPDATE"] = "False"
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 import time
 
 import cv2
@@ -11,11 +14,11 @@ from managers.person_model import YOLOManager
 class AppVision:
     def __init__(self, url_capture: str | int) -> None:
         self.cap = cv2.VideoCapture(url_capture)
-        self.tracker = YOLOManager(yolo_name='yolov8n_openvino_model/')
+        self.tracker = YOLOManager(yolo_name='yolov8n.pt')
         self.detect_isolation = DBScanManager(eps=150)
         self.face_detection = AnalysisFaceManager(
-            providers=['OpenVINOExecutionProvider','CPUExecutionProvider'],
-            use_gpu=False
+            providers=['CUDAExecutionProvider','CPUExecutionProvider'],
+            use_gpu=True
         )
         self.emotions = EmotionDetecManager()
         self.persons = {}
@@ -107,7 +110,7 @@ class AppVision:
 
                 cv2.imshow('EmpatIA', result.plot())
 
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            if cv2.waitKey(15) & 0xFF == ord('q'):
                 break
 
         self.cap.release()
