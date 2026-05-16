@@ -43,6 +43,25 @@ class AnalysisFaceManager:
         self.faces_vetors: dict = {}
         self.conf = conf
 
+        def parser_images(self, images: list) -> None:
+            for img in images:
+                _img = cv2.imread(img)
+
+                if _img is None:
+                    print(f'image {img} is None')
+                    continue
+
+                faces = self.app.get(_img)
+
+                if len(faces) > 0:
+                    embedding = faces[0].normed_embedding
+
+                    self.faces_vetors[img.split('/')[-1]] = embedding
+
+                else:
+                    print('nenhum rosto detectado')
+                    continue
+
     def get_face_person(self, base, crop_frame):
         img_base = cv2.imread(base)
 
