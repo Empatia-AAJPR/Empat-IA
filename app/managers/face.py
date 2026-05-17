@@ -73,7 +73,8 @@ class AnalysisFaceManager:
         face_base = self.app.get(img_base)
 
         face_detect = self.app.get(img_detect)
-
+        if not face_detect or len(face_detect) == 0:
+            return None
         embedding_base = face_base[0].normed_embedding
         embedding_detect = face_detect[0].normed_embedding
 
