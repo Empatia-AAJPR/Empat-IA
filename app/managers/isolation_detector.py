@@ -3,7 +3,7 @@ from sklearn.cluster import DBSCAN
 
 
 class DBScanManager:
-    def __init__(self, eps: float = float(250)) -> None:
+    def __init__(self, eps: float = float(150)) -> None:
         self.scan = DBSCAN(eps=eps, min_samples=2)
         self.inf_persons: dict
         self.persons_cord: list

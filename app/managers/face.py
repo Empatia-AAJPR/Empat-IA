@@ -62,28 +62,47 @@ class AnalysisFaceManager:
                 print('nenhum rosto detectado')
                 continue
 
-    def get_face_person(self, base, crop_frame):
-        img_base = cv2.imread(base)
+    def register_faces(self, images: list[dict[str, any]]):
+        
+        picture = images[0]
+        for nome, caminho in picture.items():
+            img = cv2.imread(caminho)
+            if img is None:
+                print(f" Erro: Não foi possível ler a imagem de {nome} no caminho: {caminho}")
+                continue
+            face = self.app.get(img)
+            if len(face) > 0:
+                embedding_face = face[0].normed_embedding
+                self.faces_vetors[nome] = embedding_face
 
+        
+    def get_face_person(self, crop_frame):
+        
         img_detect = crop_frame
-
-        if img_base is None:
-            return
-
-        face_base = self.app.get(img_base)
-
         face_detect = self.app.get(img_detect)
         if not face_detect or len(face_detect) == 0:
             return None
-        embedding_base = face_base[0].normed_embedding
+        
         embedding_detect = face_detect[0].normed_embedding
+        for k ,value in self.faces_vetors.items():
 
-        similarity = np.dot(embedding_base, embedding_detect)
-
-        return self.is_same_person(similarity)
+            similarity = np.dot(value, embedding_detect)
+            if similarity > 0.5:
+                return k
+            
 
     def is_same_person(self, result):
         if result >= self.conf:
             return True
 
         return False
+
+
+if __name__ == '__main__':
+    analisar = AnalysisFaceManager(True)
+
+    analisar.register_faces([{ 'Antonio' : r'Empat-IA\app\assets\antonio.jpeg' ,
+                                'Arthur' : r'Empat-IA\app\assets\arthur.jpeg',
+                                'Joao' : r'Empat-IA\app\assets\joao.jpeg',
+                                'Pablo' : r'Empat-IA\app\assets\pablo.jpeg',
+                                'Rian' : r'Empat-IA\app\assets\rian.jpeg',}])

@@ -10,12 +10,12 @@ from managers.face import AnalysisFaceManager
 from managers.isolation_detector import DBScanManager
 from managers.person_model import YOLOManager
 
-
+  
 class AppVision:
     def __init__(self, url_capture: str | int) -> None:
         self.cap = cv2.VideoCapture(url_capture)
         self.tracker = YOLOManager(yolo_name='yolov8n.pt')
-        self.detect_isolation = DBScanManager(eps=150)
+        self.detect_isolation = DBScanManager(eps=285)
         self.face_detection = AnalysisFaceManager(
             providers=['CUDAExecutionProvider','CPUExecutionProvider'],
             use_gpu=True
@@ -79,6 +79,12 @@ class AppVision:
                         for person_id in lonely_ids:
                             if person_id not in ids:
                                 continue
+                            
+                            lista = self.face_detection.register_faces([{ 'Antonio' : r'Empat-IA\app\assets\antonio.jpeg' ,
+                                                                         'Arthur' : r'Empat-IA\app\assets\arthur.jpeg',
+                                                                         'Joao' : r'Empat-IA\app\assets\joao.jpeg',
+                                                                         'Pablo' : r'Empat-IA\app\assets\pablo.jpeg',
+                                                                         'Rian' : r'Empat-IA\app\assets\rian.jpeg',}])
 
                             box_ids = self.persons[person_id]['box']
 
@@ -86,17 +92,16 @@ class AppVision:
                                 if self.face_cache.get(person_id):
                                     crop = self.cut_frame(frame, box_ids)
                                     cv2.imshow(f'id: {person_id}', crop)
-                                    print('verificado')
+                                    print('Essa pessoa ja foi verificada')
                                     continue
 
                             crop = self.cut_frame(frame, box_ids)
 
                             combined = self.face_detection.get_face_person(
-                                'app/assets/arthur.jpeg', crop
+                             crop
                             )
-
                             if combined is None or combined is False:
-                                print('nao e a mesma pessoa')
+                                print('Pessoa não cadastrada')
                                 continue
 
                             self.face_cache[person_id] = bool(combined)
@@ -104,7 +109,11 @@ class AppVision:
                             self.last_face_check[person_id] = time.time()
 
                             emocao = self.emotions.capture_emotion(img=crop)
-                            print(emocao)
+                            if not self.emotions.is_negative_emotion(emocao):
+                                continue
+
+
+                            print(f'O {combined} está se sentindo: {emocao}')
 
                             cv2.imshow(f'id: {combined}', crop)
 
