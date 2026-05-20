@@ -26,6 +26,7 @@ class EmotionDetecManager:
             if value == conf:
                 return key
 
+
 if __name__ == '__main__':
     detector = EmotionDetecManager()
     pessoa = 'app/assets/rian.jpeg'

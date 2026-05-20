@@ -28,7 +28,8 @@ class YOLOManager:
             verbose=False,
         )
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     cap = cv2.VideoCapture(2)
 
     while True:
@@ -41,4 +42,3 @@ if __name__ == "__main__":
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-
