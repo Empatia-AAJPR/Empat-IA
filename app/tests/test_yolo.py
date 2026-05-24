@@ -82,7 +82,7 @@ class AppVision:
                 pessoa_recortada = self.cut_frame(frame, box)
 
                 window_name = f'Pessoa ID {track_id}'
-                cv2.imshow(window_name, pessoa_recortada)
+                # cv2.imshow(window_name, pessoa_recortada)
 
         print('Pressione qualquer tecla em uma janela de imagem para fechar.')
         cv2.waitKey(0)

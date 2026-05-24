@@ -1,4 +1,5 @@
 import os
+
 # Desativa a atualização automática do YOLO para evitar travamentos/mensagens no terminal
 os.environ['YOLO_AUTOUPDATE'] = 'False'
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
@@ -45,7 +46,7 @@ class AppVision:
         Carga Inicial de Cadastros: Conecta ao Redis, recupera os dados dos alunos,
         descompacta as informações e injeta os rostos no gerenciador de faces de uma só vez.
         """
-         
+
         get_student_use_case = GetStudentUseCase(
             self.redis_repo, CompacterService()
         )
@@ -62,31 +63,29 @@ class AppVision:
         while True:
             ret, frame = self.cap.read()
             if not ret:
+                print('nao foi possivel iniciar a leitura')
                 break
-
-            if frame is None or frame.size == 0:
-                continue
 
             self.persons = {}
 
-            if self.frame_count % 90 == 0:
+            if self.frame_count % 300 == 0:
                 self.load_registers()
 
             frame = cv2.resize(frame, (960, 640))
             self.frame_count += 1
+
             results = self.tracker._track_frame(frame)
 
             for result in results:
                 attr = self._get_atributes(result)
+
                 boxes = attr['boxes']
                 confs = attr['confidence']
                 ids = self._get_ids(result, boxes)
 
                 for box, conf, id in zip(boxes, confs, ids):
                     if id is not None:
-
                         id = int(id)
-
                         self.persons[id] = {
                             'box': list(
                                 map(lambda x: round(float(x), 2), box)
@@ -95,49 +94,68 @@ class AppVision:
                         }
 
                 if self.persons:
-                    lonely_ids = self.cached_isolations
                     if self.frame_count % self.pass_frame == 0:
                         self.cached_isolations = self.detect_isolation.execute(
                             self.persons
                         )
-                        lonely_ids = self.cached_isolations
+
+                    lonely_ids = self.cached_isolations
+
                     if lonely_ids:
                         for person_id in lonely_ids:
                             if person_id not in ids:
                                 continue
 
                             box_ids = self.persons[person_id]['box']
-                           
-                            crop = self.cut_frame(frame, box_ids)
 
-                            if crop.size <= 0:
+                            if not self.cooldown_rechead(person_id):
+                                if self.face_cache.get(person_id):
+                                    crop = self.cut_frame(frame, box_ids)
+                                    if crop.size > 0:
+                                        cv2.imshow(f'id: {person_id}', crop)
                                 continue
+
+                            crop = self.cut_frame(frame, box_ids)
+                            if crop.size == 0:
+                                continue
+
                             combined = self.face_detection.get_face_person(
                                 crop
                             )
-                            if combined is None or combined is False:
-                                continue
-                            self.face_cache[person_id] = bool(combined)
-                            self.last_face_check[person_id] = time.time()
-                            emocao = self.emotions.capture_emotion(img=crop)
 
-                            if not self.emotions.is_negative_emotion(emocao):
+                            if combined is None or combined is False:
+                                print('nao e a mesma pessoa')
                                 continue
+
+                            self.face_cache[person_id] = bool(combined)
+
+                            self.last_face_check[person_id] = time.time()
+
+                            emotion = self.emotions.capture_emotion(img=crop)
 
                             send_process_use_case = SendProcessStudentUseCase(
                                 self.redis_repo
                             )
-                            print(f'VERIFICACAO: {combined} e {emocao}')
 
-                            if emocao:
-                                send_process_use_case.execute(combined, emocao)
+                            for pessoa in self.registrados:
+                                if str(combined) == str(pessoa.get('id')):
+                                    if combined and emotion:
+                                        send_process_use_case.execute(
+                                            pessoa['id'],
+                                            pessoa['name'],
+                                            emotion,
+                                        )
+                                        print('classificacao enviada')
 
-                            cv2.imshow('Imagem Verificada', crop)
+                            cv2.imshow(f'id: {combined}', crop)
 
-                        emocao = ''
+                    emotion = ''
+
                 cv2.imshow('EmpatIA', result.plot())
-            if cv2.waitKey(15) & 0xFF == ord('q'):
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+
         self.cap.release()
         cv2.destroyAllWindows()
 

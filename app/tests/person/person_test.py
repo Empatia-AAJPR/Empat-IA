@@ -38,7 +38,7 @@ if __name__ == '__main__':
         if not ret:
             break
 
-        cv2.imshow('t', frame)
+        # cv2.imshow('t', frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

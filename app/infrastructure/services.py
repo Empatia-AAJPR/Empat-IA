@@ -7,18 +7,19 @@ import numpy as np
 class CompacterService(ICompaterService):
     """
     Serviço de Infraestrutura - CompacterService.
-    
-    Classe utilitária responsável por converter imagens abertas pelo OpenCV 
-    em texto (Base64) e vice-versa. Essa conversão é necessária porque o 
-    banco de dados Redis só armazena texto/strings, enquanto os modelos de 
+
+    Classe utilitária responsável por converter imagens abertas pelo OpenCV
+    em texto (Base64) e vice-versa. Essa conversão é necessária porque o
+    banco de dados Redis só armazena texto/strings, enquanto os modelos de
     Inteligência Artificial (YOLO, InsightFace) só entendem matrizes do NumPy.
-    - encoded_img: Pega uma imagem da câmera, compacta em formato JPEG (para 
-                   diminuir o tamanho) e transforma em uma string Base64 pronta 
+    - encoded_img: Pega uma imagem da câmera, compacta em formato JPEG (para
+                   diminuir o tamanho) e transforma em uma string Base64 pronta
                    para ser salva no banco.
-    - decoded_img: Pega o texto em Base64 vindo do Redis, transforma de volta 
-                   em bytes, recria a matriz binária (NumPy) e reconstrói a 
+    - decoded_img: Pega o texto em Base64 vindo do Redis, transforma de volta
+                   em bytes, recria a matriz binária (NumPy) e reconstrói a
                    imagem colorida original para ser processada pela IA.
     """
+
     @staticmethod
     def encoded_img(img):
         if img is None:

@@ -5,19 +5,20 @@ from config.connection_option import connect_option
 class RedisConnectionHandler:
     """
     Gerenciador de Conexão - RedisConnectionHandler.
-    Classe responsável por centralizar o ciclo de vida da conexão com o banco de 
-    dados Redis. Ela mapeia os parâmetros de rede e autenticação para garantir 
+    Classe responsável por centralizar o ciclo de vida da conexão com o banco de
+    dados Redis. Ela mapeia os parâmetros de rede e autenticação para garantir
     que uma instância válida do cliente Redis esteja disponível para os repositórios.
 
     - __host: Endereço do servidor Redis.
     - __port: Porta lógica convertida para inteiro.
     - __decode_responses: Booleano que define se os bytes do banco serão convertidos em strings.
     - __username / __password: Credenciais de autenticação seguras.
-    
-    - connect: Cria e inicializa a instância de conexão com o cliente Redis 
+
+    - connect: Cria e inicializa a instância de conexão com o cliente Redis
                utilizando as credenciais fornecidas, retornando o objeto de conexão.
     - get_conn: Recupera a conexão ativa que já foi previamente estabelecida.
     """
+
     def __init__(self) -> None:
         self.__host = connect_option['HOST']
         self.__port = int(connect_option['PORT'])

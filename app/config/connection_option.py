@@ -1,8 +1,8 @@
 """
 Configuração de Infraestrutura - Connection Options.
-Este script é responsável por centralizar a extração e o mapeamento das credenciais 
-de rede necessárias para estabelecer uma conexão com o banco de dados Redis. Ele 
-utiliza a biblioteca 'python-dotenv' para carregar variáveis de ambiente a partir 
+Este script é responsável por centralizar a extração e o mapeamento das credenciais
+de rede necessárias para estabelecer uma conexão com o banco de dados Redis. Ele
+utiliza a biblioteca 'python-dotenv' para carregar variáveis de ambiente a partir
 de um arquivo oculto '.env', garantindo a segurança dos dados sensíveis.
 
 - HOST: Endereço IP ou domínio do servidor Redis (Retorna vazio '' se não configurado).

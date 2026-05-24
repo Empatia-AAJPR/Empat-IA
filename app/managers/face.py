@@ -2,8 +2,8 @@ import os
 
 from typing import Any
 
-''' CONFIGURAÇÃO DO AMBIENTE E ACELERAÇÃO POR HARDWARE (GPU):
- Define o caminho para os binários do Toolkit do NVIDIA CUDA instalados no Windows '''
+""" CONFIGURAÇÃO DO AMBIENTE E ACELERAÇÃO POR HARDWARE (GPU):
+ Define o caminho para os binários do Toolkit do NVIDIA CUDA instalados no Windows """
 cuda_path = r'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.4\bin'
 if os.path.exists(cuda_path):
     # Adiciona o diretório da CUDA ao PATH de DLLs do Python para que o ONNX Runtime encontre a GPU
@@ -20,7 +20,6 @@ except:
     # Caso ocorra erro na importação do pacote, ignora e prossegue (caso use a CPU)
     pass
 
-import cv2
 import numpy as np
 from insightface.app import FaceAnalysis
 
@@ -61,21 +60,25 @@ class AnalysisFaceManager:
         Cadastro de Faces (Dicionário): Recebe um dicionário estruturado com chaves de nomes
         e valores de caminhos de imagens. Processa as fotos em disco e gera o banco de dados vetorial.
         """
-        for picture in images:
-            for nome, caminho in picture.items():
-                if nome in self.faces_vetors:
+        for img in images:
+            _img = img.get('vector')
+
+            if _img is None:
+                continue
+
+            faces = self.app.get(_img)
+
+            if len(faces) > 0:
+                embedding = faces[0].normed_embedding
+
+                student_id = img.get('id')
+                if not student_id:
                     continue
 
-                img = caminho
-                if img is None:
-                    print(
-                        f' Erro: Não foi possível ler a imagem de {nome} no caminho: {caminho}'
-                    )
-                    continue
-                face = self.app.get(img)
-                if len(face) > 0:
-                    embedding_face = face[0].normed_embedding
-                    self.faces_vetors[nome] = embedding_face
+                self.registers_model[str(student_id)] = {
+                    'name': img.get('name', 'Sem Nome'),
+                    'embedding': embedding,
+                }
 
     def get_face_person(self, crop_frame):
         """
