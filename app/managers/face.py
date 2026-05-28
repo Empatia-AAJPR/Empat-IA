@@ -54,6 +54,7 @@ class AnalysisFaceManager:
         self.app.prepare(ctx_id=0 if use_gpu else -1, det_size=(320, 320))
         self.faces_vetors: dict = {}
         self.conf = conf
+        self.registers_model: dict = {}
 
     def register_faces(self, images: list[dict[str, Any]]):
         """
@@ -90,8 +91,8 @@ class AnalysisFaceManager:
         if not face_detect or len(face_detect) == 0:
             return None
         embedding_detect = face_detect[0].normed_embedding
-        for k, value in self.faces_vetors.items():
-            similarity = np.dot(value, embedding_detect)
+        for k, value in self.registers_model.items():
+            similarity = np.dot(value['embedding'], embedding_detect)
             print(f'SIMILARIDADE: {similarity}')
             if similarity >= 0.5:
                 return k

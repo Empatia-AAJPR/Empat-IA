@@ -40,6 +40,7 @@ class AppVision:
         self.__conn = RedisConnectionHandler().connect()
         self.redis_repo = RedisRepository(self.__conn)
         self.load_registers()
+        self.registrados = []
 
     def load_registers(self):
         """
@@ -53,6 +54,7 @@ class AppVision:
         student = get_student_use_case.execute()
 
         if student:
+            self.registrados = student
             self.face_detection.register_faces(student)
 
     def run(self) -> None:
@@ -63,7 +65,7 @@ class AppVision:
         while True:
             ret, frame = self.cap.read()
             if not ret:
-                print('nao foi possivel iniciar a leitura')
+                print('não foi possivel iniciar a leitura')
                 break
 
             self.persons = {}
@@ -111,8 +113,8 @@ class AppVision:
                             if not self.cooldown_rechead(person_id):
                                 if self.face_cache.get(person_id):
                                     crop = self.cut_frame(frame, box_ids)
-                                    if crop.size > 0:
-                                        cv2.imshow(f'id: {person_id}', crop)
+                                    # f crop.size > 0:
+                                    # cv2.imshow(f'id: {person_id}', crop)
                                 continue
 
                             crop = self.cut_frame(frame, box_ids)
@@ -124,7 +126,7 @@ class AppVision:
                             )
 
                             if combined is None or combined is False:
-                                print('nao e a mesma pessoa')
+                                # print('nao e a mesma pessoa')
                                 continue
 
                             self.face_cache[person_id] = bool(combined)
@@ -145,13 +147,13 @@ class AppVision:
                                             pessoa['name'],
                                             emotion,
                                         )
-                                        print('classificacao enviada')
+                                        # print('classificacao enviada')
 
-                            cv2.imshow(f'id: {combined}', crop)
+                            # cv2.imshow(f'id: {combined}', crop)
 
                     emotion = ''
 
-                cv2.imshow('EmpatIA', result.plot())
+                # cv2.imshow('EmpatIA', result.plot())
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break

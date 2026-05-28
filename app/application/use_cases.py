@@ -19,12 +19,7 @@ class GetStudentUseCase:
 
     def execute(self):
 
-        # return [
-        #     {key: self.compacter_service.decoded_img(value)}
-        #     for key, value in self.redis_repo.h_get_all('back:register').items()
-        # ]
-
-        student_data = self.redis_repo.h_get_all('back:resgister')
+        student_data = self.redis_repo.h_get_all('back:register')
         if not student_data:
             return []
         result = []

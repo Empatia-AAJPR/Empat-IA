@@ -8,7 +8,21 @@ class EmotionDetecManager:
         e define quais emoções acionam o protocolo de alerta do sistema.
         """
         self.detector = FER(mtcnn=False)
-        self.emocoes_ruins = ['sad', 'angry', 'fear', 'disgust', 'neutral']
+        self.emocoes_ruins = [
+            'sad',
+            'angry',
+            'fear',
+            'disgust',
+            'neutral',
+        ]
+
+        self.traducao_emocoes = {
+            'sad': 'triste',
+            'angry': 'raiva',
+            'fear': 'medo',
+            'disgust': 'nojo',
+            'neutral': 'neutro',
+        }
 
     def capture_emotion(self, img):
         """
@@ -34,13 +48,13 @@ class EmotionDetecManager:
 
         for key, value in _emotions.items():
             if value == conf:
-                return key
 
-    def is_negative_emotion(self, emotion_name: str) -> bool:
+                return self.negative_emotion(key)
+
+    def negative_emotion(self, emotion_name: str) -> str | None:
         """
         Filtro de Relevância: Verifica se o nome da emoção predominante identificada na câmera
         faz parte da lista de monitoramento crítico ('self.emocoes_ruins').
         """
         if emotion_name in self.emocoes_ruins:
-            return True
-        return False
+            return self.traducao_emocoes[emotion_name]

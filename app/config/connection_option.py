@@ -23,4 +23,4 @@ connect_option = {
     'USERNAME': os.getenv('_USERNAME', 'default'),
     'DECODE': os.getenv('DECODE', ''),
 }
-print(connect_option)
+# print(connect_option)
